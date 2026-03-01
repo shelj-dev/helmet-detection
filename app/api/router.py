@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse
 
 api_router = APIRouter()
 
+api_router.include_router(video.router, tags=["video"])
+
 
 @api_router.get("/control", response_class=HTMLResponse, tags=["interface"])
 async def control_page():

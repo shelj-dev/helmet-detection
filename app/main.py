@@ -6,12 +6,20 @@ from contextlib import asynccontextmanager
 
 from app.services.video_processor import CameraService
 
+import RPi.GPIO as GPIO
+
+# from app.services.relay_control import RelayService
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.camera = CameraService()
+    
+    # self.relay = RelayService(pin=17)
+    # self.last_relay_state = False
+    
     yield
     app.state.camera.stop()
+    GPIO.cleanup()
     print("App shutting down")
 
 app = FastAPI(
@@ -27,7 +35,7 @@ app.include_router(api_router)
 
 @app.get("/")
 def read_root():
-    return {"message": "AI Rover API. Access control interface at /control"}
+    return {"message": "Helmet detection. Access control interface at /control"}
 
 
 if __name__ == "__main__":

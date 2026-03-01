@@ -1,131 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>AI Rover Control Panel</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				flex-direction: column;
-				height: 100vh;
-				margin: 0;
-				background-color: #f0f0f0;
-				color: #333;
-			}
-			.container {
-				text-align: center;
-				background-color: #fff;
-				padding: 20px 40px;
-				border-radius: 10px;
-				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-			}
-			h1 {
-				color: #555;
-			}
-			.controls {
-				display: grid;
-				grid-template-columns: repeat(3, 1fr);
-				gap: 15px;
-				margin-top: 20px;
-			}
-			.controls button {
-				padding: 15px 30px;
-				font-size: 16px;
-				cursor: pointer;
-				border: none;
-				border-radius: 5px;
-				color: #fff;
-				transition: background-color 0.3s ease;
-			}
-			.controls button:active {
-				transform: scale(0.98);
-			}
-			#forward {
-				background-color: #4caf50;
-			}
-			#backward {
-				background-color: #f44336;
-			}
-			#left {
-				background-color: #ff9800;
-			}
-			#right {
-				background-color: #ff9800;
-			}
-			#stop {
-				background-color: #555;
-				grid-column: 2;
-			}
 
-			.status-section {
-				margin-top: 20px;
-				font-size: 18px;
-				font-weight: bold;
-			}
-			#status-message {
-				color: #007bff;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<h1>AI Rover Control Panel</h1>
-			<img id="video_feed" src="/video_feed" alt="Live Camera Feed" />
-			<div class="controls">
-				<div></div>
-				<button id="forward">Forward</button>
-				<div></div>
-				<button id="left">Left</button>
-				<button id="stop">Stop</button>
-				<button id="right">Right</button>
-				<div></div>
-				<button id="backward">Backward</button>
-				<div></div>
-			</div>
-			<div class="status-section">Current Status: <span id="status-message">Ready</span></div>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Helmet detection</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			height: 100vh;
+			margin: 0;
+			background-color: #f0f0f0;
+			color: #333;
+		}
+
+		.container {
+			text-align: center;
+			background-color: #fff;
+			padding: 20px 40px;
+			border-radius: 10px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		h1 {
+			color: #555;
+		}
+
+		.controls {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 15px;
+			margin-top: 20px;
+		}
+
+		.controls button {
+			padding: 15px 30px;
+			font-size: 16px;
+			cursor: pointer;
+			border: none;
+			border-radius: 5px;
+			color: #fff;
+			transition: background-color 0.3s ease;
+		}
+
+		.controls button:active {
+			transform: scale(0.98);
+		}
+
+		#forward {
+			background-color: #4caf50;
+		}
+
+		#backward {
+			background-color: #f44336;
+		}
+
+		#left {
+			background-color: #ff9800;
+		}
+
+		#right {
+			background-color: #ff9800;
+		}
+
+		#stop {
+			background-color: #555;
+			grid-column: 2;
+		}
+
+		.status-section {
+			margin-top: 20px;
+			font-size: 18px;
+			font-weight: bold;
+		}
+
+		#status-message {
+			color: #007bff;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Helmet Detection</h1>
+		<img id="video_feed" src="/video_feed" alt="Live Camera Feed" />
+
+		<div class="status-section">
+			Helmet Status:
+			<span id="helmet-status">Checking...</span>
 		</div>
+		<!-- 
+		<button id="btn-on">Bypass Relay Always ON</button>
+		<button id="btn-off">Bypass Relay Always OFF</button>
+		<button id="btn-disable">Disable Bypass</button> -->
+	</div>
 
-		<script>
-			const terrainClassSpan = document.getElementById("terrainClass");
-			const terrainConfidenceSpan = document.getElementById("terrainConfidence");
+	<script>
+		async function fetchHelmetStatus() {
+			try {
+				const response = await fetch("/helmet_status");
+				const data = await response.json();
 
-			document.addEventListener("DOMContentLoaded", () => {
-				const statusMessage = document.getElementById("status-message");
+				const statusElement = document.getElementById("helmet-status");
 
-				const sendCommand = async (command) => {
-					try {
-						statusMessage.textContent = "Sending command...";
-						const response = await fetch(`/${command}`);
-						const data = await response.json();
-						statusMessage.textContent = data.status;
-					} catch (error) {
-						console.error("Error:", error);
-						statusMessage.textContent = "Error sending command.";
-					}
-				};
+				if (data.helmet_detected) {
+					statusElement.textContent = "HELMET DETECTED";
+					statusElement.style.color = "green";
+				} else {
+					statusElement.textContent = "NO HELMET";
+					statusElement.style.color = "red";
+				}
 
-				document
-					.getElementById("forward")
-					.addEventListener("click", () => sendCommand("forward"));
-				document
-					.getElementById("backward")
-					.addEventListener("click", () => sendCommand("backward"));
-				document
-					.getElementById("left")
-					.addEventListener("click", () => sendCommand("left"));
-				document
-					.getElementById("right")
-					.addEventListener("click", () => sendCommand("right"));
-				document
-					.getElementById("stop")
-					.addEventListener("click", () => sendCommand("stop"));
-			});
+			} catch (error) {
+				console.error("Error fetching helmet status:", error);
+			}
+		}
 
-			
-		</script>
-	</body>
+		// Check every 500ms
+		setInterval(fetchHelmetStatus, 500);
+	</script>
+
+	<script>
+		async function sendCommand(endpoint) {
+			try {
+				await fetch(endpoint, {
+					method: "POST"
+				});
+			} catch (error) {
+				console.error("Error sending command:", error);
+			}
+		}
+
+		document.getElementById("btn-on").addEventListener("click", () => {
+			sendCommand("/bypass_relay_always_on");
+		});
+
+		document.getElementById("btn-off").addEventListener("click", () => {
+			sendCommand("/bypass_relay_always_off");
+		});
+
+		document.getElementById("btn-disable").addEventListener("click", () => {
+			sendCommand("/disable_bypass");
+		});
+	</script>
+</body>
+
 </html>
