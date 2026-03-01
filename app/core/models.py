@@ -18,8 +18,10 @@ import torch
 # model_detection = YOLO("models/helmet_ncnn_model", task="detect")
 
 ###################
-model_detection = YOLO("models/helmet1_ncnn_model", task="detect")
+model_detection = YOLO("models/helmet2_ncnn_model", task="detect")
+# model_detection = YOLO("models/helmet3_ncnn_model", task="detect")
 ###################
+# model_detection = YOLO("models/helmet.pt", task="detect")
 
 # model_detection = YOLO("models/helmet2_ncnn_model", task="detect")
 # model_detection = YOLO("models/helmet4_ncnn_model", task="detect")

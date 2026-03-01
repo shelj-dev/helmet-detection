@@ -5,6 +5,6 @@ from ultralytics import YOLO
 # model = YOLO("helmetV8.pt")
 
 # model = YOLO("helmet2.pt")
-model = YOLO("helmet4.pt")
+model = YOLO("best (1).pt")
 
 print(model.names)
